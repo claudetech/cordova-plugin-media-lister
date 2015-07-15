@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="com.claudetech.medialister" version="0.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>MediaLister</name>
+    <description>List media files present on the device</description>
+    <js-module name="MediaLister" src="www/MediaLister.js">
+        <clobbers target="mediaLister" />
+    </js-module>
+
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="MediaLister">
+                <param name="android-package" value="com.claudetech.medialister.MediaLister"/>
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        </config-file>
+
+        <source-file src="src/android/com/claudetech/medialister/MediaLister.java" target-dir="src/com/claudetech/medialister" />
+    </platform>
+</plugin>
