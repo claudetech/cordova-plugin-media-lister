@@ -23,3 +23,7 @@ mediaLister.readLibrary(function (results) {
     console.log(err);
 });
 ```
+
+## TODO
+
+Add support for pagination.
