@@ -111,32 +111,45 @@ public class MediaLister extends CordovaPlugin {
     }
 
     private void createThumbnail(JSONObject image, int width, int height) throws JSONException, IOException {
+        Bitmap thumbnail = createThumbnailBitmap(image, width, height);
+        File thumbnailFile = new File(getThumbnailPath(image.getInt("id"), width, height));
+        FileOutputStream fos = new FileOutputStream(thumbnailFile);
+        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+        fos.flush();
+        fos.close();
+        thumbnail.recycle();
+    }
+
+    private Bitmap createThumbnailBitmap(JSONObject image, int width, int height) throws JSONException {
         File file = new File(image.getString("path"));
         BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
 
         bitmapOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getAbsolutePath(), bitmapOptions);
 
-        float widthScale = (float)bitmapOptions.outWidth / width;
-        float heightScale = (float)bitmapOptions.outHeight / height;
-        float scale = Math.min(widthScale, heightScale);
-
-        int sampleSize = 1;
-        while (sampleSize < scale) {
-            sampleSize *= 2;
-        }
-        bitmapOptions.inSampleSize = sampleSize;
+        bitmapOptions.inSampleSize = calculateInSampleSize(bitmapOptions, width, height);
         bitmapOptions.inJustDecodeBounds = false;
 
-        Bitmap thumbnail = BitmapFactory.decodeFile(file.getAbsolutePath(), bitmapOptions);
+        return BitmapFactory.decodeFile(file.getAbsolutePath(), bitmapOptions);
+    }
 
-        File thumbnailFile = new File(getThumbnailPath(image.getInt("id"), width, height));
-        FileOutputStream fos = new FileOutputStream(thumbnailFile);
-        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, fos);
-        fos.flush();
-        fos.close();
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
 
-        thumbnail.recycle();
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
     }
 
     private Cursor makeMediaQueryCursor(JSONObject options) {
