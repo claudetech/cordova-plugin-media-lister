@@ -43,7 +43,9 @@ public class MediaLister extends CordovaPlugin {
     }
 
     private void readLibrary(JSONObject options, CallbackContext callbackContext) {
-        Looper.prepare();
+        if (Looper.myLooper() == null) {
+            Looper.prepare();
+        }
         try {
             JSONArray results = readMediaLibrary(options);
             callbackContext.success(results);

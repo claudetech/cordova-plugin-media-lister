@@ -21,10 +21,12 @@ exports.readLibrary = function(options, success, error) {
   }
 
   var originalSuccess = success;
-  success = function (results) {
-    var lastResult = results[results.length];
-    options.addedBefore = lastResult.dateAdded;
-    originalSuccess(results, options);
+  success = function (entries) {
+    var lastEntry = entries[entries.length - 1];
+    if (lastEntry) {
+      options.addedBefore = lastEntry.dateAdded;
+    }
+    originalSuccess({entries: entries, nextOptions: options});
   };
 
   exec(success, error, "MediaLister", "readLibrary", [options]);
