@@ -73,12 +73,11 @@ public class MediaLister extends CordovaPlugin {
 
         for (boolean hasNext = cursor.moveToFirst(); hasNext; hasNext = cursor.moveToNext()) {
             JSONObject media = new JSONObject();
-            int mediaType = cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE));
             media.put("id", cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID)));
             media.put("path", cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)));
             media.put("size", cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE)));
             media.put("mimeType", cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE)));
-            media.put("mediaType", mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE ? "image" : "video");
+            media.put("mediaType", getMediaType(cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE))));
             media.put("title", cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.TITLE)));
             media.put("dateAdded", cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_ADDED)));
             media.put("dateModified", cursor.getInt(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED)));
@@ -218,15 +217,35 @@ public class MediaLister extends CordovaPlugin {
             if (type.equals("image")) {
                 typeValue = MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
             } else if (type.equals("video")) {
-                typeValue += MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
+                typeValue = MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
             } else if (type.equals("audio")) {
-                typeValue += MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
+                typeValue = MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO;
+            } else if (type.equals("playlist")) {
+                typeValue = MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST;
+            } else if (type.equals("none")) {
+                typeValue = MediaStore.Files.FileColumns.MEDIA_TYPE_NONE;
             }
             if (typeValue != -1) {
                 conditions.add(MediaStore.Files.FileColumns.MEDIA_TYPE + "=" + typeValue);
             }
         }
         return TextUtils.join(" OR ", conditions);
+    }
+
+    private String getMediaType(int mediaType) {
+        switch (mediaType) {
+            case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
+                return "image";
+            case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
+                return "video";
+            case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST:
+                return "playlist";
+            case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
+                return "audio";
+            default:
+                return "none";
+        }
+
     }
 
     private String getThumbnailPath(int id, int width, int height) {
