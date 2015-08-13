@@ -6,6 +6,7 @@
         <clobbers target="mediaLister" />
     </js-module>
 
+    <!--Android-->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="MediaLister">
@@ -18,5 +19,17 @@
         </config-file>
 
         <source-file src="src/android/com/claudetech/medialister/MediaLister.java" target-dir="src/com/claudetech/medialister" />
+    </platform>
+
+    <!--ios-->
+    <platform name="ios">
+        <hook type="after_plugin_install" src="hooks/add_swift_support.js" />
+        <config-file target="config.xml" parent="/*">
+            <feature name="MediaLister">
+                <param name="ios-package" value="HWPMediaLister"/>
+            </feature>
+        </config-file>
+        <header-file src="src/ios/MediaLister-Bridging-Header.h" />
+        <source-file src="src/ios/MediaLister.swift" />
     </platform>
 </plugin>
