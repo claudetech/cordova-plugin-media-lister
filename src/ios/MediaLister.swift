@@ -12,9 +12,8 @@ import MobileCoreServices
     
     public func readLibrary(command: CDVInvokedUrlCommand){
         var temp = command.arguments[0] as! [String: AnyObject]
-        println(temp)
-        temp["offset"] = 0
-        loadMedia(temp)
+        option = initailizeOption(temp)
+        loadMedia(option)
         var pluginResult: CDVPluginResult! = nil
         if success == true {
             pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsArray: result)
@@ -28,6 +27,30 @@ import MobileCoreServices
         option = ["thumbnail": thumbnail, "limit":limit , "mediaTypes": mediaTypes, "offset": offset]
         loadMedia(option)
         return result
+    }
+    
+    private func initailizeOption(option:[String: AnyObject]) -> [String: AnyObject]{
+        var tempOption = option
+        if let offset = tempOption["offset"] as? Int{
+        } else {
+            tempOption["offset"] = 0
+        }
+        if let limit = tempOption["limit"] as? Int{
+        } else {
+            tempOption["limit"] = 20
+        }
+        if let thumbnail = tempOption["thumbnail"] as? Bool{
+        } else {
+            tempOption["thumbnail"] = true
+        }
+        if let mediaTypes = tempOption["mediaTypes"] as? [String]{
+            if mediaTypes == []{
+            tempOption["mdeiaTypes"] = ["image"]
+            }
+        } else {
+            tempOption["mdeiaTypes"] = ["image"]
+        }
+        return tempOption
     }
 
     private func loadMedia(option: [String: AnyObject]){
@@ -57,6 +80,7 @@ import MobileCoreServices
                 if asset != nil{
                     self.result.append(self.setDictionary(asset, id: id, option:option))
                 }
+                println("cccc")
             }
             }, failureBlock:{
                 (myerror: NSError!) -> Void in
@@ -64,7 +88,6 @@ import MobileCoreServices
             }
 
         )
-        println(result)
     }
     
     // TODO: Add data of Location etc.
