@@ -43,10 +43,7 @@ exports.readLibrary = function(options, success, error) {
   var originalSuccess = success;
   success = function (entries) {
     var nextOptions = clone(options);
-    var lastEntry = entries[entries.length - 1];
-    if (lastEntry) {
-      nextOptions.addedBefore = lastEntry.dateAdded;
-    }
+    nextOptions.offset = (option.offset || 0) + entries.length;
     originalSuccess({entries: entries, nextOptions: nextOptions});
   };
 

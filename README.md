@@ -38,7 +38,7 @@ mediaLister.readLibrary({thumbnail: true, limit: 40, mediaTypes: ['image']}, fun
     //     limit: 40,
     //     thumbnail: true,
     //     mediaTypes: ['image'],
-    //     addedBefore: 1432177751
+    //     offset: 8
     // }
 }, function (err) {
     console.log(err);
