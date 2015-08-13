@@ -42,7 +42,7 @@ public class MediaLister extends CordovaPlugin {
         return false;
     }
 
-    private void readLibrary(JSONObject options, CallbackContext callbackContext) {
+    private synchronized void readLibrary(JSONObject options, CallbackContext callbackContext) {
         if (Looper.myLooper() == null) {
             Looper.prepare();
         }
@@ -176,6 +176,8 @@ public class MediaLister extends CordovaPlugin {
         Uri queryUri = MediaStore.Files.getContentUri("external");
 
         int limit = options.optInt("limit", 20);
+        int offset = options.optInt("offset", 0);
+        String limitAndOffset = "LIMIT " + limit + " OFFSET " + offset;
 
         CursorLoader cursorLoader = new CursorLoader(
                 cordova.getActivity(),
@@ -183,7 +185,7 @@ public class MediaLister extends CordovaPlugin {
                 projection,
                 selection,
                 null,
-                MediaStore.Files.FileColumns.DATE_ADDED + " DESC LIMIT " + limit
+                MediaStore.Files.FileColumns.DATE_ADDED + " DESC " + limitAndOffset
         );
         return cursorLoader.loadInBackground();
     }
@@ -193,10 +195,6 @@ public class MediaLister extends CordovaPlugin {
         String mediaSelection = getMediaSelection(options);
         if (mediaSelection.length() > 0) {
             conditions.add(mediaSelection);
-        }
-        int addedBefore = options.optInt("addedBefore", -1);
-        if (addedBefore != -1) {
-            conditions.add(MediaStore.Files.FileColumns.DATE_ADDED + "<" + addedBefore);
         }
         String[] formattedConditions = new String[conditions.size()];
         for (int i = 0; i < conditions.size(); i++) {
