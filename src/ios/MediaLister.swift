@@ -55,7 +55,6 @@ import MobileCoreServices
             } else {
                 pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR)
             }
-            println(self.result)
             self.commandDelegate.sendPluginResult(pluginResult, callbackId: self.command.callbackId)
         }
     }
