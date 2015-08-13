@@ -16,6 +16,7 @@ import MobileCoreServices
     
     public func readLibrary(command: CDVInvokedUrlCommand){
         dispatch_async(dispatch_get_global_queue(priority, 0)){
+            self.result = []
             self.command = command
             var temp = command.arguments[0] as! [String: AnyObject]
             self.option = self.initailizeOption(temp)
@@ -103,7 +104,7 @@ import MobileCoreServices
         data["mediaType"] = setType(asset)
         var date: NSDate = asset.valueForProperty(ALAssetPropertyDate) as! NSDate
         data["dateAdded"] = date.timeIntervalSince1970
-//        data["path"] = asset.valueForProperty(ALAssetPropertyAssetURL)
+        data["path"] = asset.valueForProperty(ALAssetPropertyAssetURL).absoluteString
         var rep = asset.defaultRepresentation()
         data["size"] = Int(rep.size())
         data["orientation"] = rep.metadata()["Orientation"]
