@@ -122,10 +122,10 @@ import MobileCoreServices
         let image = UIImage(CGImage: thumbnail)
         let imageData = UIImageJPEGRepresentation(image, 0.8)
         
-        let cacheDirPath: NSString = NSSearchPathForDirectoriesInDomains(.CachesDirectory, .UserDomainMask, true)[0] as? NSString
+        let cacheDirPath: NSString = NSSearchPathForDirectoriesInDomains(.CachesDirectory, .UserDomainMask, true)[0] as NSString
         let filePath = cacheDirPath.stringByAppendingPathComponent("\(id).jpeg")
         
-        if imageData?.writeToFile(filePath, atomically: true){
+        if imageData!.writeToFile(filePath, atomically: true){
             return filePath
         } else {
             print("error occured: Cannot save thumbnail image")
@@ -146,7 +146,7 @@ import MobileCoreServices
     // TODO: Add music and playlist and audio
     private func getFilter(mediaTypes: [String]) -> ALAssetsFilter?{
         if mediaTypes.contains("image"){
-            if mediaTypes.contains(, "video"){
+            if mediaTypes.contains("video"){
                 return ALAssetsFilter.allAssets()
             } else {
                 return ALAssetsFilter.allPhotos()
