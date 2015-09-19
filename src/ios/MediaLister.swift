@@ -18,7 +18,7 @@ import MobileCoreServices
         dispatch_async(dispatch_get_global_queue(priority, 0)){
             self.result = []
             self.command = command
-            var temp = command.arguments[0] as! [String: AnyObject]
+            let temp = command.arguments[0] as! [String: AnyObject]
             self.option = self.initailizeOption(temp)
             self.loadMedia(self.option)
         }
@@ -55,7 +55,7 @@ import MobileCoreServices
             } else {
                 pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR)
             }
-            self.commandDelegate.sendPluginResult(pluginResult, callbackId: self.command.callbackId)
+            self.commandDelegate?.sendPluginResult(pluginResult, callbackId: self.command.callbackId)
         }
     }
 
@@ -90,7 +90,7 @@ import MobileCoreServices
                 self.sendResult()
             }, failureBlock:{
                 (myerror: NSError!) -> Void in
-                println("error occurred: \(myerror.localizedDescription)")
+                print("error occurred: \(myerror.localizedDescription)")
             }
 
         )
@@ -101,16 +101,16 @@ import MobileCoreServices
         var data: [String: AnyObject] = [:]
         data["id"] = id
         data["mediaType"] = setType(asset)
-        var date: NSDate = asset.valueForProperty(ALAssetPropertyDate) as! NSDate
+        let date: NSDate = asset.valueForProperty(ALAssetPropertyDate) as! NSDate
         data["dateAdded"] = date.timeIntervalSince1970
         data["path"] = asset.valueForProperty(ALAssetPropertyAssetURL).absoluteString
-        var rep = asset.defaultRepresentation()
+        let rep = asset.defaultRepresentation()
         data["size"] = Int(rep.size())
         data["orientation"] = rep.metadata()["Orientation"]
         data["title"] = rep.filename()
         data["height"] = rep.dimensions().height
         data["wigth"] = rep.dimensions().width
-        data["mimeType"] = UTTypeCopyPreferredTagWithClass(rep.UTI(), kUTTagClassMIMEType).takeUnretainedValue()
+        data["mimeType"] = UTTypeCopyPreferredTagWithClass(rep.UTI(), kUTTagClassMIMEType)!.takeUnretainedValue()
         if (option["thumbnail"] as! Bool) {
             data["thumbnailPath"] = saveThumbnail(asset, id: id)
         }
@@ -122,13 +122,13 @@ import MobileCoreServices
         let image = UIImage(CGImage: thumbnail)
         let imageData = UIImageJPEGRepresentation(image, 0.8)
         
-        let cacheDirPath: NSString = NSSearchPathForDirectoriesInDomains(.CachesDirectory, .UserDomainMask, true)[0] as! NSString
+        let cacheDirPath: NSString = NSSearchPathForDirectoriesInDomains(.CachesDirectory, .UserDomainMask, true)[0] as? NSString
         let filePath = cacheDirPath.stringByAppendingPathComponent("\(id).jpeg")
         
-        if imageData.writeToFile(filePath, atomically: true){
+        if imageData?.writeToFile(filePath, atomically: true){
             return filePath
         } else {
-            println("error occured: Cannot save thumbnail image")
+            print("error occured: Cannot save thumbnail image")
             return ""
         }
     }
@@ -145,13 +145,13 @@ import MobileCoreServices
     
     // TODO: Add music and playlist and audio
     private func getFilter(mediaTypes: [String]) -> ALAssetsFilter?{
-        if contains(mediaTypes, "image"){
-            if contains(mediaTypes, "video"){
+        if mediaTypes.contains("image"){
+            if mediaTypes.contains(, "video"){
                 return ALAssetsFilter.allAssets()
             } else {
                 return ALAssetsFilter.allPhotos()
             }
-        } else if contains(mediaTypes, "video"){
+        } else if mediaTypes.contains("video"){
             return ALAssetsFilter.allVideos()
         }
         return nil
